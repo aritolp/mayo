@@ -1,7 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-// Carga de propiedades usando rootProject para asegurar la ruta
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -43,8 +42,7 @@ android {
             
             val fileName = keystoreProperties["storeFile"] as? String
             if (fileName != null) {
-                // file(fileName) buscará relativo a este build.gradle
-                // como en el .yml pusimos "../", subirá a la carpeta /android/ correctamente
+                // Ahora buscará 'upload-keystore.jks' dentro de la carpeta android/app
                 storeFile = file(fileName) 
             }
         }
