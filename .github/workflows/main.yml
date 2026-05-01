@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '17' # Sincronizado con Gradle
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -23,23 +23,20 @@ jobs:
           channel: 'stable'
           cache: false
 
-      - name: Verify Flutter Version
-        run: flutter --version
-
-      - name: Decode Keystore
-        # Lo guardamos directamente en la carpeta 'app'
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
-
-      - name: Create key.properties
-        # Lo creamos también en 'app' para que Gradle lo encuentre fácil
-        run: |
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/app/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/app/key.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/app/key.properties
-          echo "storeFile=upload-keystore.jks" >> android/app/key.properties
-
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Decode Keystore
+        # Lo guardamos en la carpeta /android/
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      - name: Create key.properties
+        # Lo creamos en /android/. El path del storeFile apunta un nivel arriba del build.gradle
+        run: |
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "storeFile=../upload-keystore.jks" >> android/key.properties
 
       - name: Build APK
         run: flutter build apk --release
