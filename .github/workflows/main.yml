@@ -15,31 +15,30 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '17' # Java 17 es ideal para versiones modernas de AGP
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Al no poner versión y usar channel stable, descarga la última sí o sí
           channel: 'stable'
           cache: false
 
       - name: Verify Flutter Version
-        # Esto nos dirá en el log exactamente qué versión bajó
         run: flutter --version
 
       - name: Decode Keystore
+        # Se decodifica directamente en la carpeta donde Gradle lo busca
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
 
       - name: Create key.properties
+        # Creamos el archivo dentro de android/app/ para que coincida con el Gradle
         run: |
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/app/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/app/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/app/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/app/key.properties
 
       - name: Install dependencies
-        # Quitamos el clean para que no pida confirmación (Y/n) y falle
         run: flutter pub get
 
       - name: Build APK
