@@ -3,7 +3,7 @@ import java.io.FileInputStream
 
 // 1. Carga de propiedades al inicio
 val keystoreProperties = Properties()
-val keystorePropertiesFile = project.file("key.properties")
+val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
@@ -16,7 +16,6 @@ plugins {
 
 android {
     namespace = "com.prueba.tvplus"
-    ndkVersion = "28.2.13676358"
     compileSdk = flutter.compileSdkVersion
 
     compileOptions {
