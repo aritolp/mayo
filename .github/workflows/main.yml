@@ -27,22 +27,21 @@ jobs:
         run: flutter --version
 
       - name: Decode Keystore
-        # Se decodifica en la raíz de 'android/' para que coincida con key.properties
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+        # Lo guardamos directamente en la carpeta 'app'
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
 
       - name: Create key.properties
-        # Creamos el archivo en 'android/' para que el Gradle (rootProject) lo lea bien
+        # Lo creamos también en 'app' para que Gradle lo encuentre fácil
         run: |
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/app/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/app/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/app/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/app/key.properties
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        # Flutter build apk automáticamente buscará la configuración de release
         run: flutter build apk --release
 
       - name: Upload Artifact
